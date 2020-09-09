@@ -1,0 +1,53 @@
+<div class="d-flex justify-content-center mt-5" *ngIf="schedule">
+    <div class="col-5">
+        <ng-container *ngIf="schedule.appointmentId > 0">
+            <h3 class="page-title">Update / Delete Appointment</h3>
+        </ng-container>
+
+        <ng-container *ngIf="schedule.appointmentId === 0">
+            <h1 class="page-title">Create Appointment</h1>
+        </ng-container>
+
+        <a class="btn btn-primary mb-3" routerLink="/schedule">View All Appointments</a>
+        
+        <form [formGroup]="appointmentForm">
+            <div class="form-group">
+                <label for="patientId">Patient:</label>
+                <select class="custom-select" formControlName="patientId">                    
+                    <option *ngFor="let patient of patients" [value]="patient.id">
+                        {{patient.firstName + " " + patient.lastName}} ({{patient.dateOfBirth | date}})
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="appointmentTime">Appointment time:</label>
+                <input type="datetime-local" formControlName="appointmentTime" class="form-control" 
+                    [ngModel]="schedule.appointmentTime | date:'yyyy-MM-ddThh:mm'">
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea formControlName="notes" class="form-control" [ngModel]="schedule.notes">                    
+                </textarea>
+            </div>
+            
+            <div class="form-group" *ngIf="schedule && schedule.appointmentId === 0">
+                <button type="button" class="btn btn-primary" (click)="onCreate()"
+                    [disabled]="appointmentForm.invalid">
+                    Save
+                </button>
+            </div>
+
+            <div class="form-group" *ngIf="schedule && schedule.appointmentId > 0">
+                <button type="button" class="btn btn-primary mr-5" (click)="onUpdate()"
+                    [disabled]="appointmentForm.invalid">
+                    Update
+                </button>
+
+                <button type="button" class="btn btn-primary" (click)="onDelete()" 
+                    [disabled]="appointmentForm.invalid">
+                    Delete
+                </button>
+            </div>
+        </form>
+</div>
+</div>
