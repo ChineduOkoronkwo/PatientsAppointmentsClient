@@ -34,7 +34,8 @@ export class ScheduleDetailComponent implements OnInit {
     this.appointmentForm = this.fb.group({
       patientId: [null, [Validators.required]],
       appointmentTime: [null, [Validators.required]],
-      notes: [null, [Validators.required]]
+      notes: [null, [Validators.required]],
+      appointmentDate: [null, [Validators.required]]
     });
   }
 
@@ -53,7 +54,7 @@ export class ScheduleDetailComponent implements OnInit {
     this.scheduleService.searchSchedule(searchParam).subscribe(response => {
       if (response && response.length === 1) {
         this.schedule = response[0];
-        this.appointmentForm.patchValue({patientId: this.schedule.patientId});
+        this.setAppointmentValues(response[0]);
       }
     }, error => {
       console.log(error);
@@ -93,6 +94,12 @@ export class ScheduleDetailComponent implements OnInit {
       appointmentTime: new Date(),
       notes: '',
     };
-    console.log(this.schedule);
+  }
+
+  setAppointmentValues(schedule: ISchedule): void {
+    this.appointmentForm.patchValue({patientId: schedule.patientId});
+    this.appointmentForm.patchValue({appointmentDate: new Date(schedule.appointmentTime)});
+    this.appointmentForm.patchValue({appointmentTime: schedule.appointmentTime});
+    this.appointmentForm.patchValue({notes: schedule.notes});
   }
 }
