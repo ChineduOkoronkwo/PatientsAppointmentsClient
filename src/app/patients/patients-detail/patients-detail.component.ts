@@ -43,7 +43,6 @@ export class PatientsDetailComponent implements OnInit {
     this.patientsService.getPatient(+id).subscribe(response => {
       if (response) {
         this.patient = response;
-        console.log(this.patient);
         this.setPatientValues();
       }
     });

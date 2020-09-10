@@ -55,7 +55,7 @@ export class ScheduleDetailComponent implements OnInit {
     this.scheduleService.searchSchedule(searchParam).subscribe(response => {
       if (response && response.length === 1) {
         this.schedule = response[0];
-        this.setAppointmentValues(response[0]);
+        this.setAppointmentValues();
       }
     }, error => {
       console.log(error);
@@ -145,18 +145,26 @@ export class ScheduleDetailComponent implements OnInit {
     this.appointmentForm.patchValue({appointmentTime: this.schedule.appointmentTime});
   }
 
-  setAppointmentValues(schedule: ISchedule): void {
+  setAppointmentValues(): void {
     if (this.patients === null) {
+      alert('There is an error communicating with the server');
       console.log('error! patients has not been loaded');
       return;
     }
-    const patient = this.patients.find(p => p.id === schedule.patientId);
+
+    if (this.schedule === null) {
+      alert('There is an error communicating with the server');
+      console.log('error! schedule has not been loaded');
+      return;
+    }
+
+    const patient = this.patients.find(p => p.id === this.schedule.patientId);
     if (patient) {
       this.appointmentForm.patchValue({patientId: this.createPatientView(patient)});
     }
-    this.appointmentForm.patchValue({appointmentDate: new Date(schedule.appointmentTime)});
-    this.appointmentForm.patchValue({appointmentTime: schedule.appointmentTime});
-    this.appointmentForm.patchValue({notes: schedule.notes});
+    this.appointmentForm.patchValue({appointmentDate: new Date(this.schedule.appointmentTime)});
+    this.appointmentForm.patchValue({appointmentTime: this.schedule.appointmentTime});
+    this.appointmentForm.patchValue({notes: this.schedule.notes});
     this.appointmentForm.get('patientId').disable();
   }
 
@@ -169,9 +177,12 @@ export class ScheduleDetailComponent implements OnInit {
     + new Date(this.appointmentForm.value.appointmentTime).toISOString().substring(10);
     appointment.AppointmentTime = new Date(apptDate);
 
-    const patientId = String(this.appointmentForm.value.patientId).split(':')[0];
-    appointment.patientId = +patientId;
-
+    if (!this.appointmentForm.get('patientId').disabled) {
+      const patientId = String(this.appointmentForm.value.patientId).split(':')[0];
+      appointment.patientId = +patientId;
+    } else {
+      appointment.patientId = this.schedule.patientId;
+    }
     return appointment;
   }
 
