@@ -13,27 +13,45 @@
         <form [formGroup]="appointmentForm">
             <div class="form-group">
                 <label for="patientId">Patient:</label>
-                <select class="custom-select" formControlName="patientId">                    
-                    <option *ngFor="let patient of patients" [value]="patient.id">
-                        {{patient.firstName + " " + patient.lastName}} ({{patient.dateOfBirth | date}})
-                    </option>
-                </select>
+                <input [typeahead]="patientsValue" [isAnimated]="true" class="form-control" 
+                    formControlName="patientId">
+                <a class="text-danger" *ngIf="appointmentForm.get('patientId').touched 
+                    && appointmentForm.get('patientId').invalid">
+                    Patient is required!
+                </a>
             </div>
             <div class="form-group">
                 <label for="appointmentDate">Appointment Date:</label>
-                <input type="text" placeholder="Datepicker" class="form-control" bsDatepicker 
+                <input type="text" placeholder="Appointment Date" class="form-control" bsDatepicker 
                     formControlName="appointmentDate">
+                <a class="text-danger" *ngIf="appointmentForm.get('appointmentDate').invalid
+                    && appointmentForm.get('appointmentDate').touched">
+                    Appointment date is required!
+                </a>               
             </div>
             <div class="form-group">
                 <label for="appointmentTime">Appointment time:</label>
-                <timepicker formControlName="appointmentTime"></timepicker>
+                <timepicker formControlName="appointmentTime" class="form-control" required></timepicker>
+                <a class="text-danger" *ngIf="appointmentForm.get('appointmentTime').invalid
+                    && appointmentForm.get('appointmentTime').touched">Appointment time is required</a>
             </div>
             <div class="form-group">
                 <label for="notes">Notes:</label>
                 <textarea formControlName="notes" class="form-control">                    
                 </textarea>
+                <a class="text-danger" *ngIf="appointmentForm.get('notes').touched 
+                    && appointmentForm.get('notes').invalid 
+                    && appointmentForm.get('notes').errors['required']">
+                    Notes is required!
+                </a>
+                <a class="text-danger" *ngIf="appointmentForm.get('notes').touched 
+                    && appointmentForm.get('notes').invalid
+                    && !appointmentForm.get('notes').errors['required']">
+                    {{appointmentForm.get('notes').errors['required']}}
+                    Maximum length of 200 characters exceeded!
+                </a>
             </div>
-            
+
             <div class="form-group" *ngIf="schedule && schedule.appointmentId === 0">
                 <button type="button" class="btn btn-primary" (click)="onCreate()"
                     [disabled]="appointmentForm.invalid">
@@ -52,6 +70,7 @@
                     Delete
                 </button>
             </div>
-        </form>
+            
+        </form>        
 </div>
 </div>

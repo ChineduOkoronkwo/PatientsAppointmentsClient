@@ -2,10 +2,10 @@
     <div class="row">
 
         <section class="col-3">
-            <h5 class="text-warning ml-3 mt-4 mb-3">Appointments From:</h5>
+            <h5 class="text-secondary ml-3 mt-4 mb-3">Appointments From:</h5>
             <input type="datetime-local" (change)="onDateChanged($event.target.value)">
             
-            <h5 class="ml-3">Patients:</h5>
+            <h5 class="text-secondary mt-3 ml-3">Patients:</h5>
             <select class="custom-select mb-4" (change)="onPatientSelected($event.target.value)">
                 <option *ngFor="let patient of patients" [value]="patient.id">
                     {{patient.firstName + " " + patient.lastName}}

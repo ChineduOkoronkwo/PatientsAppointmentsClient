@@ -1,3 +1,4 @@
+import { Appointment } from './../shared/models/appointment';
 import { SearchParam } from './../shared/models/searchParams';
 import { ISchedule } from './../shared/models/schedule';
 import { IPatient } from './../shared/models/patients';
@@ -33,6 +34,27 @@ export class ScheduleService {
         return response.body;
       })
     );
+  }
+
+  createAppointment(appointment: Appointment): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}appointments`, appointment)
+      .pipe(map(response => {
+        return response;
+      }));
+  }
+
+  updateAppointment(appointment: Appointment): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}appointments`, appointment)
+      .pipe(map(response => {
+        return response;
+      }));
+  }
+
+  deleteAppointment(id: number): any {
+    return this.http.delete<boolean>(`${this.baseUrl}appointments/${id}`)
+      .pipe(map(response => {
+        return response;
+      }));
   }
 
 }

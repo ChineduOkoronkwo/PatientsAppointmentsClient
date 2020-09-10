@@ -1,12 +1,11 @@
+import { Appointment } from './../../shared/models/appointment';
 import { SearchParam } from './../../shared/models/searchParams';
 import { IPatient } from './../../shared/models/patients';
 import { ScheduleService } from './../schedule.service';
 import { ISchedule } from './../../shared/models/schedule';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-schedule-detail',
@@ -17,11 +16,13 @@ export class ScheduleDetailComponent implements OnInit {
   schedule: ISchedule;
   patients: IPatient[];
   appointmentForm: FormGroup;
+  patientsValue: any[];
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private scheduleService: ScheduleService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -32,10 +33,10 @@ export class ScheduleDetailComponent implements OnInit {
 
   createFormGroup(): void {
     this.appointmentForm = this.fb.group({
-      patientId: [null, [Validators.required]],
-      appointmentTime: [null, [Validators.required]],
-      notes: [null, [Validators.required]],
-      appointmentDate: [null, [Validators.required]]
+      patientId: [null, Validators.required],
+      appointmentDate: [null, Validators.required],
+      appointmentTime: [null, Validators.required],
+      notes: [null, [Validators.required, Validators.maxLength(200)]]
     });
   }
 
@@ -64,24 +65,71 @@ export class ScheduleDetailComponent implements OnInit {
   getPatients(): void {
     this.scheduleService.getPatients().subscribe(response => {
       this.patients = response;
+      const arr = Array<string>();
+      response.forEach(p => {
+        arr.push(
+          this.createPatientView(p)
+        );
+      });
+      this.patientsValue = arr;
     }, error => {
       console.log(error);
     });
   }
 
+  createPatientView(p: IPatient): string {
+    return  p.id + ': ' + p.firstName + ' ' + p.lastName +
+      ' (' + new Date(p.dateOfBirth).toLocaleDateString() + ')';
+  }
+
   onCreate(): void {
-    console.log('appointment created');
-    console.log(this.appointmentForm.value);
+    if (!confirm('Create this appointment?')) {
+      return;
+    }
+
+    const appointment = this.createAppointment();
+    this.scheduleService.createAppointment(appointment).subscribe(response => {
+      if (response) {
+        alert('Appointment created!');
+        this.backToSchedule();
+      }
+    }, error => {
+      console.log(error);
+      alert(error);
+    });
   }
 
   onUpdate(): void {
-    console.log('appointment updated');
-    console.log(this.appointmentForm.value);
+    if (!confirm('Update this appointment?')) {
+      return;
+    }
+
+    const appointment = this.createAppointment();
+    this.scheduleService.updateAppointment(appointment).subscribe(response => {
+      if (response) {
+        alert('Appointment updated!');
+        this.backToSchedule();
+      }
+    }, error => {
+      console.log(error);
+      alert(error);
+    });
   }
 
   onDelete(): void {
-    console.log('appointment deleted');
-    console.log(this.appointmentForm.value);
+    if (!confirm('Delete this appointment?')) {
+      return;
+    }
+
+    this.scheduleService.deleteAppointment(this.schedule.appointmentId).subscribe(response => {
+      if (response) {
+        alert('Appointment updated!');
+        this.backToSchedule();
+      }
+    }, error => {
+      console.log(error);
+      alert(error);
+    });
   }
 
   setDefaultSchedule(): void {
@@ -94,12 +142,39 @@ export class ScheduleDetailComponent implements OnInit {
       appointmentTime: new Date(),
       notes: '',
     };
+
+    this.appointmentForm.patchValue({appointmentTime: this.schedule.appointmentTime});
   }
 
   setAppointmentValues(schedule: ISchedule): void {
-    this.appointmentForm.patchValue({patientId: schedule.patientId});
+    const patient = this.patients.find(p => p.id === schedule.patientId);
+    if (patient) {
+      this.appointmentForm.patchValue({patientId: this.createPatientView(patient)});
+    }
     this.appointmentForm.patchValue({appointmentDate: new Date(schedule.appointmentTime)});
     this.appointmentForm.patchValue({appointmentTime: schedule.appointmentTime});
     this.appointmentForm.patchValue({notes: schedule.notes});
+  }
+
+  createAppointment(): Appointment {
+    const appointment = new Appointment();
+    appointment.id = this.schedule.appointmentId;
+    appointment.Notes = this.appointmentForm.value.notes;
+
+    const apptDate = new Date(this.appointmentForm.value.appointmentDate).toISOString().substring(0, 10)
+    + new Date(this.appointmentForm.value.appointmentTime).toISOString().substring(10);
+    appointment.AppointmentTime = new Date(apptDate);
+
+    const patientId = String(this.appointmentForm.value.patientId).split(':')[0];
+    appointment.patientId = +patientId;
+
+    return appointment;
+  }
+
+  confirm(message: string): any  {
+  }
+
+  backToSchedule(): void {
+    this.router.navigateByUrl('/schedule');
   }
 }
