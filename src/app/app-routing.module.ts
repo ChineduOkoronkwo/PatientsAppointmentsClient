@@ -5,7 +5,9 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'schedule', loadChildren: () => import('./schedule/schedule.module')
-    .then(mod => mod.ScheduleModule)}
+    .then(mod => mod.ScheduleModule)},
+  {path: 'patients', loadChildren: () => import('./patients/patients.module')
+    .then(mod => mod.PatientsModule)}
 ];
 
 @NgModule({

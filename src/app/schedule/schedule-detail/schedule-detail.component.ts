@@ -128,7 +128,6 @@ export class ScheduleDetailComponent implements OnInit {
       }
     }, error => {
       console.log(error);
-      alert(error);
     });
   }
 
@@ -147,6 +146,10 @@ export class ScheduleDetailComponent implements OnInit {
   }
 
   setAppointmentValues(schedule: ISchedule): void {
+    if (this.patients === null) {
+      console.log('error! patients has not been loaded');
+      return;
+    }
     const patient = this.patients.find(p => p.id === schedule.patientId);
     if (patient) {
       this.appointmentForm.patchValue({patientId: this.createPatientView(patient)});
@@ -154,6 +157,7 @@ export class ScheduleDetailComponent implements OnInit {
     this.appointmentForm.patchValue({appointmentDate: new Date(schedule.appointmentTime)});
     this.appointmentForm.patchValue({appointmentTime: schedule.appointmentTime});
     this.appointmentForm.patchValue({notes: schedule.notes});
+    this.appointmentForm.get('patientId').disable();
   }
 
   createAppointment(): Appointment {

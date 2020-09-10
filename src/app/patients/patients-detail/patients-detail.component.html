@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-center mt-5" *ngIf="patient">
+    <div class="col-5">
+        <ng-container *ngIf="patient.id > 0">
+            <h3 class="page-title">Update Patient</h3>
+        </ng-container>
+
+        <ng-container *ngIf="patient.id === 0">
+            <h1 class="page-title">Create Patient</h1>
+        </ng-container>
+
+        <a class="btn btn-primary mb-3" routerLink="/patients">View All Patients</a>
+        
+        <form [formGroup]="patientForm">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" formControlName="firstname" class="form-control">
+                <a class="text-danger" *ngIf="patientForm.get('firstname').touched 
+                    && patientForm.get('firstname').invalid">
+                    First Name is required!
+                </a>
+            </div>
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" formControlName="lastname" class="form-control">
+                <a class="text-danger" *ngIf="patientForm.get('lastname').touched 
+                    && patientForm.get('lastname').invalid">
+                    Last Name is required!
+                </a>
+            </div>
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input type="text" placeholder="Date of Birth" class="form-control" bsDatepicker 
+                    formControlName="dateOfBirth">
+                <a class="text-danger" *ngIf="patientForm.get('dateOfBirth').invalid
+                    && patientForm.get('dateOfBirth').touched">
+                    Date of Birth is required!
+                </a>               
+            </div>
+
+            <div class="form-group" *ngIf="patient && patient.id === 0">
+                <button type="button" class="btn btn-primary" (click)="onCreate()"
+                    [disabled]="patientForm.invalid">
+                    Create
+                </button>
+            </div>
+
+            <div class="form-group" *ngIf="patient && patient.id > 0">
+                <button type="button" class="btn btn-primary" (click)="onUpdate()"
+                    [disabled]="patientForm.invalid">
+                    Update
+                </button>
+            </div>
+            
+        </form>        
+</div>
+</div>

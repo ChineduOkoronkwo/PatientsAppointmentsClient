@@ -1,0 +1,48 @@
+<div class="container mt-3">
+    <div class="row">
+        <h2>Patients</h2>
+    </div>
+    <div class="row">
+        <a class="btn btn-outline-primary my-2" routerLink="/patients/0">
+            Create New Patient
+        </a>
+    </div>
+    <div class="row">
+        <table class="table mt-1">
+            <tr bgcolor="#f9f9f9">
+                <th>PatientId</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Date Of Birth</th>
+                <th></th>
+                <th></th>
+            </tr>
+        
+            <tr *ngFor="let patient of patients">
+                <td>
+                    {{ patient.id }}
+                </td>
+                <td>
+                    {{ patient.firstName }}
+                </td>
+                <td>
+                    {{ patient.lastName }}
+                </td>
+                <td>
+                    {{ patient.dateOfBirth | date}}
+                </td>
+                <td>
+                    <a class="btn btn-outline-primary" routerLink="/patients/{{patient.id}}">
+                        Edit
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-outline-primary" (click)="deletePatient(patient.id)"> 
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
